@@ -8,7 +8,7 @@ use Regnerisch\LaravelBeyond\Resolvers\DomainNameSchemaResolver;
 
 class MakeModelCommand extends Command
 {
-    protected $signature = 'beyond:make:model {name} {-m|--migration} {--overwrite}';
+    protected $signature = 'beyond:make:model {name?} {-m|--migration} {--overwrite}';
 
     protected $description = 'Make a new model';
 
@@ -18,33 +18,33 @@ class MakeModelCommand extends Command
             $name = $this->argument('name');
             $overwrite = $this->option('overwrite');
 
-            $schema = new DomainNameSchemaResolver($name);
+            $schema = (new DomainNameSchemaResolver($this, $name))->handle();
 
             beyond_copy_stub(
                 'model.stub',
-                base_path() . '/src/Domain/' . $schema->getPath('Models') . '.php',
+                $schema->path('Models'),
                 [
-                    '{{ domain }}' => $schema->getDomainName(),
-                    '{{ className }}' => $schema->getClassName(),
+                    '{{ namespace }}' => $schema->namespace(),
+                    '{{ className }}' => $schema->className(),
                 ],
                 $overwrite
             );
 
             if ($this->option('migration')) {
-                $tableName = Str::snake(Str::pluralStudly($schema->getClassName()));
+                $tableName = Str::snake(Str::pluralStudly($schema->className()));
                 $fileName = now()->format('Y_m_d_his') . '_create_' . $tableName . '_table';
 
                 beyond_copy_stub(
                     'migration.stub',
                     base_path() . '/database/migrations' . $fileName . '.php',
                     [
-                        '{{ tableName }}' => $tableName
+                        '{{ tableName }}' => $tableName,
                     ],
                     $overwrite
                 );
             }
 
-            $this->info("Model created.");
+            $this->info('Model created.');
         } catch (\Exception $exception) {
             $this->error($exception->getMessage());
         }

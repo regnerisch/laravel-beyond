@@ -7,7 +7,7 @@ use Regnerisch\LaravelBeyond\Resolvers\DomainNameSchemaResolver;
 
 class MakeEventCommand extends Command
 {
-    protected $signature = 'beyond:make:event {name} {--overwrite}';
+    protected $signature = 'beyond:make:event {name?} {--overwrite}';
 
     protected $description = 'Make a new event';
 
@@ -17,19 +17,19 @@ class MakeEventCommand extends Command
             $name = $this->argument('name');
             $overwrite = $this->option('overwrite');
 
-            $schema = new DomainNameSchemaResolver($name);
+            $schema = (new DomainNameSchemaResolver($this, $name))->handle();
 
             beyond_copy_stub(
                 'event.stub',
-                base_path() . '/src/Domain/' . $schema->getPath('Events') . '.php',
+                $schema->path('Events'),
                 [
-                    '{{ domain }}' => $schema->getDomainName(),
-                    '{{ className }}' => $schema->getClassName(),
+                    '{{ namespace }}' => $schema->namespace(),
+                    '{{ className }}' => $schema->className(),
                 ],
                 $overwrite
             );
 
-            $this->info("Event created.");
+            $this->info('Event created.');
         } catch (\Exception $exception) {
             $this->error($exception->getMessage());
         }

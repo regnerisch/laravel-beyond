@@ -7,7 +7,7 @@ use Regnerisch\LaravelBeyond\Resolvers\AppNameSchemaResolver;
 
 class MakeRequestCommand extends Command
 {
-    protected $signature = 'beyond:make:request {name} {--overwrite}';
+    protected $signature = 'beyond:make:request {name?} {--overwrite}';
 
     protected $description = 'Make a new request';
 
@@ -17,20 +17,19 @@ class MakeRequestCommand extends Command
             $name = $this->argument('name');
             $overwrite = $this->option('overwrite');
 
-            $schema = new AppNameSchemaResolver($name);
+            $schema = (new AppNameSchemaResolver($this, $name))->handle();
 
             beyond_copy_stub(
                 'request.stub',
-                base_path() . '/src/App/' . $schema->getPath('Requests') . '.php',
+                $schema->path('Requests'),
                 [
-                    '{{ application }}' => $schema->getAppName(),
-                    '{{ module }}' => $schema->getModuleName(),
-                    '{{ className }}' => $schema->getClassName(),
+                    '{{ namespace }}' => $schema->namespace(),
+                    '{{ className }}' => $schema->className(),
                 ],
                 $overwrite
             );
 
-            $this->info("Request created.");
+            $this->info('Request created.');
         } catch (\Exception $exception) {
             $this->error($exception->getMessage());
         }

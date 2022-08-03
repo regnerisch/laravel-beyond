@@ -2,7 +2,7 @@
     "name": "regnerisch/laravel-beyond",
     "type": "library",
     "license": "ISC",
-    "version": "3.0.0",
+    "version": "3.0.0-beta.10",
     "autoload": {
         "psr-4": {
             "Regnerisch\\LaravelBeyond\\": "src/"
@@ -10,6 +10,11 @@
         "files": [
             "src/helper.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
     },
     "authors": [
         {
@@ -39,6 +44,17 @@
             "providers": [
                 "Regnerisch\\LaravelBeyond\\LaravelBeyondServiceProvider"
             ]
+        }
+    },
+    "require-dev": {
+        "pestphp/pest": "^1.21",
+        "orchestra/testbench": "^7.6",
+        "spatie/data-transfer-object": "^3.8",
+        "spatie/laravel-query-builder": "^5.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     }
 }
